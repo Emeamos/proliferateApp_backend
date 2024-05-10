@@ -1,40 +1,31 @@
 import Tutor from '../model/tutor.js'
+import User from '../model/user.js';
 import Subject from '../model/subject.js';
-import cloudinary from '../utilis/cloudinary.js';
-
 export const createTutorController = async (req, res) => {
+  const { fullname, availability } = req.body;
+  const subjectId = req.params.subjectId;
+  const userId = req.user.id; // Assuming you have userId available in req.user
+
   try {
-    const subjectId = req.params.subjectId; 
-    // const { subjectId, image, cloudinary_id, fullname, qualification, user } = data;
-    // const { secure_url: image, public_id: cloudinary_id } = await cloudinary.upload(req.file.path);
-    const result = await cloudinary.uploader.upload(req.file.path);
-    const { secure_url: image, public_id: cloudinary_id } = result;
-    // Create a new tutor
-    const newTutor = await Tutor.create({
-        image,
-        cloudinary_id,
-        subject: [subjectId],
-        fullname,
-        qualification
-    });
+      const newTutor = new Tutor({
+          fullname,
+          subject: [subjectId], 
+          availability
+      });
 
-    // Push the tutorId to the subject's tutor array
-    await Subject.findByIdAndUpdate(
-        subjectId,
-        { $push: { tutors: newTutor._id } },
-        { new: true }
-    );
+      await newTutor.save();
 
-    const responseData = {
-        image,
-        subject: [subjectId],
-        fullname,
-        qualification,
-    };
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
 
-    res.status(200).json({ message: 'Tutor created and associated with subject', data: responseData });
+      user.tutor.push(newTutor._id);
+      await user.save();
+
+      res.status(201).json({ message: 'Tutor added successfully', tutor: newTutor });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
   }
 };
