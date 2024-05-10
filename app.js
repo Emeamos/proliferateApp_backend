@@ -8,17 +8,18 @@ import classRoute from "./routes/class.js";
 import searchRouter from "./routes/search.js";
 import bodyparser from "body-parser";
 import cors from "cors";
+import notificationRoute from "./routes/notification.js";
 
 dotenv.config({path:'./.env'});
 
 
 const app = express();
-//app.use(cors());
+
 
 
 
 dbConnect();
-// log requests
+
 
  app.use
       cors({
@@ -28,18 +29,19 @@ dbConnect();
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
    }) ;
 
-// app.use(morgan('tiny'));
+
 
 app.use(express.json());
 
 app.use(bodyparser.urlencoded({ extended : true}))
 
-  app.use("/api/v1/user", userRoute);
-  app.use("/api/v1/subject", subjectRoute);
-  app.use("/api/v1/tutor", tutorRoute);
-  app.use("/api/v1/classes", classRoute);
-  app.use("/api/v1/search", searchRouter);
-//   app.use("/api/v1/essentials", essentialsRoute);
+  app.use("/api/user", userRoute);
+  app.use("/api/subject", subjectRoute);
+  app.use("/api/tutor", tutorRoute);
+  app.use("/api/classes", classRoute);
+  app.use("/api/search", searchRouter);
+  app.use("/api/notification", notificationRoute)
+
 
 
 const PORT = process.env.PORT || 7000
