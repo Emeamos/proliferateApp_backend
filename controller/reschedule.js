@@ -11,14 +11,12 @@ export const rescheduleController = async (req, res) => {
             return res.status(404).json({ message: 'Class not found' });
         }
 
-        // Create a notification
         const notification = new Notification({
             class: updatedClass._id,
             message: `The class "${updatedClass.name}" has been rescheduled for ${newDate}.`
         });
         await notification.save();
 
-        // Associate notification with the class
         updatedClass.notifications.push(notification);
         await updatedClass.save();
 

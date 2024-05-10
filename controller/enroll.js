@@ -20,8 +20,6 @@ export const enrollController = async (req, res) => {
         if (!Tutor.Subject.includes(subjectId)) {
             return res.status(400).json({ message: 'Tutor does not teach the selected subject' });
           }
-
-        // Create a new class
         const newClass = new Classmodel({
             subject: subjectId,
             tutor: tutorId
@@ -32,13 +30,11 @@ export const enrollController = async (req, res) => {
             { new: true }
         );
 
-        // Create a notification for the enrolled class
         const notification = Notification.create({
             class: newClass._id,
             message: `You have successfully enrolled in the class "${subject.name}" with tutor "${tutor.name}".`
         });
 
-        // Associate notification with the class
         newClass.notifications.push(notification);
         await newClass.save();
 
